@@ -2,18 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, RefreshCw } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import {
+  ArrowLeft,
+  LogOut,
+  RefreshCw,
+  Users,
+} from "lucide-react";
 
 type Lead = {
-  id: string | number;
+  id: number;
   name: string;
   email: string;
-  phone?: string | null;
-  company?: string | null;
-  service?: string | null;
-  budget?: string | null;
-  project_description?: string | null;
+  phone: string;
+  company: string;
+  service: string;
+  budget: string;
+  project_description: string;
   created_at: string;
 };
 
@@ -22,267 +26,199 @@ export default function AdminPage() {
 
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [checkingAuth, setCheckingAuth] = useState(true);
-  const [error, setError] = useState("");
 
-  async function checkUser() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  useEffect(() => {
+    const authenticated = localStorage.getItem("dataforge_admin");
 
-    if (!user) {
-      router.replace("/admin/login");
+    if (authenticated !== "true") {
+      router.push("/admin/login");
       return;
     }
 
-    setCheckingAuth(false);
     loadLeads();
-  }
+  }, [router]);
 
-  async function loadLeads() {
+  function loadLeads() {
     setLoading(true);
-    setError("");
 
-    const { data, error } = await supabase
-      .from("leads")
-      .select("*")
-      .order("created_at", { ascending: false });
+    // No database is connected.
+    // This keeps the admin page functional without Supabase.
+    const storedLeads = localStorage.getItem("dataforge_leads");
 
-    if (error) {
-      setError(error.message);
-      setLeads([]);
+    if (storedLeads) {
+      try {
+        setLeads(JSON.parse(storedLeads));
+      } catch {
+        setLeads([]);
+      }
     } else {
-      setLeads(data || []);
+      setLeads([]);
     }
 
     setLoading(false);
   }
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.replace("/admin/login");
-  }
-
-  useEffect(() => {
-    checkUser();
-  }, []);
-
-  if (checkingAuth) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-[#050505] text-white">
-        <p className="text-sm text-white/40">
-          Checking authentication...
-        </p>
-      </main>
-    );
+  function handleLogout() {
+    localStorage.removeItem("dataforge_admin");
+    router.push("/admin/login");
   }
 
   return (
     <main className="min-h-screen bg-[#050505] text-white">
-
-      {/* NAVBAR */}
       <nav className="border-b border-white/10">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
-
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-sm font-black text-black">
               D
             </div>
 
-            <span className="text-lg font-semibold">
-              DataForge <span className="text-white/35">AI</span>
-            </span>
+            <div>
+              <p className="text-sm font-semibold">
+                DataForge AI
+              </p>
+
+              <p className="text-xs text-white/30">
+                Admin Dashboard
+              </p>
+            </div>
           </div>
 
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-sm text-white/40 transition hover:text-white"
-          >
-            <LogOut size={16} />
-            Logout
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={loadLeads}
+              className="flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm text-white/60 transition hover:border-white/20 hover:text-white"
+            >
+              <RefreshCw size={16} />
+              Refresh
+            </button>
 
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm text-white/60 transition hover:border-white/20 hover:text-white"
+            >
+              <LogOut size={16} />
+              Logout
+            </button>
+          </div>
         </div>
       </nav>
 
-      {/* CONTENT */}
-      <section className="mx-auto max-w-7xl px-6 py-16">
-
-        <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-
+      <div className="mx-auto max-w-7xl px-6 py-12">
+        <div className="mb-10 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-white/30">
-              DataForge AI
+              Dashboard
             </p>
 
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-6xl">
-              Lead Dashboard
+            <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
+              Enquiries
             </h1>
 
-            <p className="mt-4 text-sm text-white/40">
-              Manage enquiries submitted through your website.
+            <p className="mt-3 text-sm text-white/40">
+              Manage enquiries submitted through the website.
             </p>
           </div>
 
-          <button
-            onClick={loadLeads}
-            disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm text-white/60 transition hover:border-white/20 hover:text-white disabled:opacity-50"
+          <a
+            href="/"
+            className="flex items-center gap-2 text-sm text-white/40 transition hover:text-white"
           >
-            <RefreshCw
-              size={16}
-              className={loading ? "animate-spin" : ""}
-            />
-            Refresh
-          </button>
-
+            <ArrowLeft size={16} />
+            Back to website
+          </a>
         </div>
 
-        {/* STATS */}
-        <div className="mt-12 grid gap-4 sm:grid-cols-3">
+        <div className="mb-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-3xl border border-white/10 bg-white/[0.025] p-7">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10">
+              <Users size={19} />
+            </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-            <p className="text-xs uppercase tracking-widest text-white/30">
+            <p className="mt-6 text-sm text-white/40">
               Total enquiries
             </p>
 
-            <p className="mt-3 text-3xl font-semibold">
+            <p className="mt-2 text-4xl font-semibold">
               {leads.length}
             </p>
           </div>
-
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-            <p className="text-xs uppercase tracking-widest text-white/30">
-              Services requested
-            </p>
-
-            <p className="mt-3 text-3xl font-semibold">
-              {new Set(
-                leads.map((lead) => lead.service).filter(Boolean)
-              ).size}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-            <p className="text-xs uppercase tracking-widest text-white/30">
-              Latest enquiry
-            </p>
-
-            <p className="mt-3 text-sm font-medium">
-              {leads.length
-                ? new Date(
-                    leads[0].created_at
-                  ).toLocaleDateString()
-                : "No enquiries"}
-            </p>
-          </div>
-
         </div>
 
-        {/* ERROR */}
-        {error && (
-          <div className="mt-8 rounded-2xl border border-red-500/20 bg-red-500/10 p-5 text-sm text-red-300">
-            {error}
-          </div>
-        )}
-
-        {/* LEADS */}
-        <div className="mt-10 space-y-5">
-
+        <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.025]">
           {loading ? (
-            <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-10 text-center text-sm text-white/40">
+            <div className="flex min-h-[300px] items-center justify-center text-sm text-white/40">
               Loading enquiries...
             </div>
           ) : leads.length === 0 ? (
-            <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-10 text-center">
-              <p className="text-lg font-medium">
-                No enquiries yet
-              </p>
+            <div className="flex min-h-[300px] flex-col items-center justify-center px-6 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10">
+                <Users size={22} />
+              </div>
 
-              <p className="mt-2 text-sm text-white/35">
-                New website enquiries will appear here.
+              <h2 className="mt-5 text-xl font-semibold">
+                No enquiries yet
+              </h2>
+
+              <p className="mt-2 max-w-md text-sm leading-6 text-white/35">
+                New website enquiries will appear here once a backend or
+                storage system is connected.
               </p>
             </div>
           ) : (
-            leads.map((lead) => (
-              <article
-                key={lead.id}
-                className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8"
-              >
-                <div className="flex flex-col justify-between gap-5 lg:flex-row">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[900px] text-left">
+                <thead className="border-b border-white/10">
+                  <tr className="text-xs uppercase tracking-wider text-white/30">
+                    <th className="px-6 py-5">Name</th>
+                    <th className="px-6 py-5">Email</th>
+                    <th className="px-6 py-5">Company</th>
+                    <th className="px-6 py-5">Service</th>
+                    <th className="px-6 py-5">Budget</th>
+                    <th className="px-6 py-5">Date</th>
+                  </tr>
+                </thead>
 
-                  <div>
+                <tbody>
+                  {leads.map((lead) => (
+                    <tr
+                      key={lead.id}
+                      className="border-b border-white/5 text-sm last:border-0"
+                    >
+                      <td className="px-6 py-5 font-medium">
+                        {lead.name}
+                      </td>
 
-                    <h2 className="text-xl font-medium">
-                      {lead.name}
-                    </h2>
-
-                    <p className="mt-1 text-sm text-white/30">
-                      {lead.service || "General enquiry"}
-                    </p>
-
-                    <div className="mt-5 space-y-2 text-sm text-white/50">
-
-                      <p>
-                        <strong>Email:</strong>{" "}
+                      <td className="px-6 py-5 text-white/50">
                         {lead.email}
-                      </p>
+                      </td>
 
-                      {lead.phone && (
-                        <p>
-                          <strong>Phone:</strong>{" "}
-                          {lead.phone}
-                        </p>
-                      )}
+                      <td className="px-6 py-5 text-white/50">
+                        {lead.company || "—"}
+                      </td>
 
-                      {lead.company && (
-                        <p>
-                          <strong>Company:</strong>{" "}
-                          {lead.company}
-                        </p>
-                      )}
+                      <td className="px-6 py-5 text-white/50">
+                        {lead.service}
+                      </td>
 
-                      {lead.budget && (
-                        <p>
-                          <strong>Budget:</strong>{" "}
-                          {lead.budget}
-                        </p>
-                      )}
+                      <td className="px-6 py-5 text-white/50">
+                        {lead.budget || "—"}
+                      </td>
 
-                    </div>
-
-                  </div>
-
-                  <p className="text-xs text-white/25">
-                    {new Date(
-                      lead.created_at
-                    ).toLocaleString()}
-                  </p>
-
-                </div>
-
-                {lead.project_description && (
-                  <div className="mt-7 border-t border-white/10 pt-6">
-
-                    <p className="text-xs uppercase tracking-widest text-white/25">
-                      Project details
-                    </p>
-
-                    <p className="mt-3 text-sm leading-7 text-white/50">
-                      {lead.project_description}
-                    </p>
-
-                  </div>
-                )}
-
-              </article>
-            ))
+                      <td className="px-6 py-5 text-white/40">
+                        {lead.created_at
+                          ? new Date(
+                              lead.created_at
+                            ).toLocaleDateString()
+                          : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-
         </div>
-
-      </section>
-
+      </div>
     </main>
   );
 }

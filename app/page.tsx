@@ -13,7 +13,6 @@ import {
   Workflow,
 } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { supabase } from "@/lib/supabase";
 
 const services = [
   {
@@ -55,7 +54,11 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.from("leads").insert({
+      // No Supabase.
+      // For now, the enquiry is handled locally.
+      // You can connect another backend later.
+
+      const enquiry = {
         name: String(formData.get("name") || ""),
         email: String(formData.get("email") || ""),
         phone: String(formData.get("phone") || ""),
@@ -65,17 +68,16 @@ export default function Home() {
         project_description: String(
           formData.get("project_description") || ""
         ),
-      });
+      };
 
-      if (error) {
-        alert("Supabase Error: " + error.message);
-        return;
-      }
+      console.log("New enquiry:", enquiry);
+
+      await new Promise((resolve) => setTimeout(resolve, 700));
 
       form.reset();
       setSubmitted(true);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error("Form submission error:", error);
       alert("Unable to submit the enquiry. Please try again.");
     } finally {
       setLoading(false);
@@ -84,11 +86,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#050505] text-white">
-
       {/* NAVBAR */}
       <nav className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-[#050505]/80 backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
-
           <a href="/" className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-sm font-black text-black">
               D
@@ -100,24 +100,15 @@ export default function Home() {
           </a>
 
           <div className="hidden items-center gap-8 text-sm text-white/50 md:flex">
-            <a
-              href="#services"
-              className="transition hover:text-white"
-            >
+            <a href="#services" className="transition hover:text-white">
               Services
             </a>
 
-            <a
-              href="#about"
-              className="transition hover:text-white"
-            >
+            <a href="#about" className="transition hover:text-white">
               About
             </a>
 
-            <a
-              href="#contact"
-              className="transition hover:text-white"
-            >
+            <a href="#contact" className="transition hover:text-white">
               Contact
             </a>
           </div>
@@ -128,23 +119,19 @@ export default function Home() {
           >
             Start a project
           </a>
-
         </div>
       </nav>
 
       {/* HERO */}
       <section className="relative flex min-h-screen items-center overflow-hidden pt-20">
-
         <div className="pointer-events-none absolute left-1/2 top-20 -z-10 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-white/[0.035] blur-[150px]" />
 
         <div className="mx-auto w-full max-w-7xl px-6 py-28">
-
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
           >
-
             <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.025] px-4 py-2">
               <span className="h-1.5 w-1.5 rounded-full bg-white" />
 
@@ -156,20 +143,16 @@ export default function Home() {
             <h1 className="max-w-6xl text-6xl font-semibold leading-[0.95] tracking-[-0.06em] sm:text-7xl lg:text-[100px]">
               Build smarter.
               <br />
-
-              <span className="text-white/30">
-                Move faster.
-              </span>
+              <span className="text-white/30">Move faster.</span>
             </h1>
 
             <p className="mt-10 max-w-2xl text-base leading-8 text-white/45 sm:text-lg">
               DataForge AI helps businesses turn data, artificial
-              intelligence and automation into practical technology
-              that creates measurable value.
+              intelligence and automation into practical technology that
+              creates measurable value.
             </p>
 
             <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-
               <a
                 href="#contact"
                 className="group inline-flex items-center justify-center gap-3 rounded-full bg-white px-7 py-4 text-sm font-semibold text-black transition hover:scale-105"
@@ -188,39 +171,26 @@ export default function Home() {
               >
                 Explore services
               </a>
-
             </div>
-
           </motion.div>
-
         </div>
       </section>
 
       {/* SERVICES */}
-      <section
-        id="services"
-        className="border-t border-white/10 py-28"
-      >
-
+      <section id="services" className="border-t border-white/10 py-28">
         <div className="mx-auto max-w-7xl px-6">
-
           <div className="mb-16">
-
             <p className="text-xs uppercase tracking-[0.3em] text-white/30">
               What we do
             </p>
 
             <h2 className="mt-5 max-w-3xl text-4xl font-semibold tracking-tight sm:text-6xl">
               Technology built around
-              <span className="text-white/30">
-                {" "}real problems.
-              </span>
+              <span className="text-white/30"> real problems.</span>
             </h2>
-
           </div>
 
           <div className="grid gap-5 md:grid-cols-2">
-
             {services.map((service, index) => {
               const Icon = service.icon;
 
@@ -236,12 +206,8 @@ export default function Home() {
                   }}
                   className="group rounded-3xl border border-white/10 bg-white/[0.025] p-8 transition duration-500 hover:-translate-y-1 hover:bg-white/[0.045] sm:p-10"
                 >
-
                   <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04]">
-                    <Icon
-                      size={24}
-                      className="text-white/80"
-                    />
+                    <Icon size={24} className="text-white/80" />
                   </div>
 
                   <h3 className="mt-10 text-2xl font-medium tracking-tight">
@@ -260,26 +226,17 @@ export default function Home() {
                       className="transition-transform group-hover:translate-x-1"
                     />
                   </div>
-
                 </motion.article>
               );
             })}
-
           </div>
-
         </div>
       </section>
 
       {/* ABOUT */}
-      <section
-        id="about"
-        className="border-t border-white/10 py-28"
-      >
-
+      <section id="about" className="border-t border-white/10 py-28">
         <div className="mx-auto grid max-w-7xl gap-14 px-6 lg:grid-cols-2 lg:items-center">
-
           <div>
-
             <p className="text-xs uppercase tracking-[0.3em] text-white/30">
               Why DataForge AI
             </p>
@@ -287,24 +244,19 @@ export default function Home() {
             <h2 className="mt-5 text-4xl font-semibold tracking-tight sm:text-6xl">
               Less complexity.
               <br />
-              <span className="text-white/30">
-                More impact.
-              </span>
+              <span className="text-white/30">More impact.</span>
             </h2>
-
           </div>
 
           <div>
-
             <p className="text-base leading-8 text-white/45">
-              We focus on practical technology rather than technology
-              for its own sake. Our goal is to help businesses understand
-              their data, automate repetitive work and use AI where it
-              actually creates value.
+              We focus on practical technology rather than technology for its
+              own sake. Our goal is to help businesses understand their data,
+              automate repetitive work and use AI where it actually creates
+              value.
             </p>
 
             <div className="mt-8 space-y-4">
-
               {[
                 "Business-focused solutions",
                 "Modern AI and data technologies",
@@ -315,33 +267,19 @@ export default function Home() {
                   key={item}
                   className="flex items-center gap-3 text-sm text-white/55"
                 >
-                  <Check
-                    size={16}
-                    className="text-white/50"
-                  />
-
+                  <Check size={16} className="text-white/50" />
                   {item}
                 </div>
               ))}
-
             </div>
-
           </div>
-
         </div>
       </section>
 
       {/* CONTACT */}
-      <section
-        id="contact"
-        className="border-t border-white/10 py-28"
-      >
-
+      <section id="contact" className="border-t border-white/10 py-28">
         <div className="mx-auto grid max-w-7xl gap-14 px-6 lg:grid-cols-[0.75fr_1.25fr]">
-
-          {/* CONTACT INFO */}
           <div>
-
             <p className="text-xs uppercase tracking-[0.3em] text-white/30">
               Start a conversation
             </p>
@@ -349,98 +287,72 @@ export default function Home() {
             <h2 className="mt-5 text-4xl font-semibold tracking-tight sm:text-6xl">
               Let&apos;s build
               <br />
-              <span className="text-white/30">
-                something useful.
-              </span>
+              <span className="text-white/30">something useful.</span>
             </h2>
 
             <p className="mt-6 max-w-md text-sm leading-7 text-white/40">
-              Tell us what you&apos;re trying to solve and we&apos;ll
-              help you find the right technology approach.
+              Tell us what you&apos;re trying to solve and we&apos;ll help you
+              find the right technology approach.
             </p>
 
             <div className="mt-10 space-y-4">
-
               <a
                 href="mailto:hello@dataforgeai.com"
                 className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.025] p-5 transition hover:bg-white/[0.05]"
               >
-
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10">
                   <Mail size={18} />
                 </div>
 
                 <div>
-                  <p className="text-xs text-white/30">
-                    Email
-                  </p>
+                  <p className="text-xs text-white/30">Email</p>
 
-                  <p className="mt-1 text-sm">
-                    hello@dataforgeai.com
-                  </p>
+                  <p className="mt-1 text-sm">hello@dataforgeai.com</p>
                 </div>
-
               </a>
 
               <a
                 href="https://wa.me/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.025] p-5 transition hover:bg-white/[0.05]"
               >
-
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10">
                   <MessageCircle size={18} />
                 </div>
 
                 <div>
-                  <p className="text-xs text-white/30">
-                    WhatsApp
-                  </p>
+                  <p className="text-xs text-white/30">WhatsApp</p>
 
-                  <p className="mt-1 text-sm">
-                    Chat with us
-                  </p>
+                  <p className="mt-1 text-sm">Chat with us</p>
                 </div>
-
               </a>
 
               <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.025] p-5">
-
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10">
                   <Phone size={18} />
                 </div>
 
                 <div>
-                  <p className="text-xs text-white/30">
-                    Response
-                  </p>
+                  <p className="text-xs text-white/30">Response</p>
 
                   <p className="mt-1 text-sm">
                     We&apos;ll get back to you soon
                   </p>
                 </div>
-
               </div>
-
             </div>
-
           </div>
 
-          {/* FORM */}
           <div className="rounded-3xl border border-white/10 bg-white/[0.025] p-6 sm:p-9">
-
             {submitted ? (
-
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="flex min-h-[550px] flex-col items-center justify-center text-center"
               >
-
                 <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-white/[0.04]">
-                  <Check
-                    size={30}
-                    className="text-white/80"
-                  />
+                  <Check size={30} className="text-white/80" />
                 </div>
 
                 <h3 className="mt-7 text-3xl font-semibold">
@@ -448,8 +360,8 @@ export default function Home() {
                 </h3>
 
                 <p className="mt-4 max-w-md text-sm leading-7 text-white/40">
-                  Your enquiry has been received. We&apos;ll review
-                  the details and get back to you.
+                  Your enquiry has been received. We&apos;ll review the details
+                  and get back to you.
                 </p>
 
                 <button
@@ -458,21 +370,11 @@ export default function Home() {
                 >
                   Send another enquiry
                 </button>
-
               </motion.div>
-
             ) : (
-
-              <form
-                onSubmit={handleSubmit}
-                className="space-y-6"
-              >
-
-                {/* NAME + EMAIL */}
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid gap-6 sm:grid-cols-2">
-
                   <div>
-
                     <label className="mb-2 block text-xs text-white/40">
                       Your name *
                     </label>
@@ -484,11 +386,9 @@ export default function Home() {
                       placeholder="John Doe"
                       className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3.5 text-sm outline-none transition placeholder:text-white/20 focus:border-white/30"
                     />
-
                   </div>
 
                   <div>
-
                     <label className="mb-2 block text-xs text-white/40">
                       Email *
                     </label>
@@ -500,16 +400,11 @@ export default function Home() {
                       placeholder="john@company.com"
                       className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3.5 text-sm outline-none transition placeholder:text-white/20 focus:border-white/30"
                     />
-
                   </div>
-
                 </div>
 
-                {/* PHONE + COMPANY */}
                 <div className="grid gap-6 sm:grid-cols-2">
-
                   <div>
-
                     <label className="mb-2 block text-xs text-white/40">
                       Phone / WhatsApp
                     </label>
@@ -520,11 +415,9 @@ export default function Home() {
                       placeholder="+91 98765 43210"
                       className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3.5 text-sm outline-none transition placeholder:text-white/20 focus:border-white/30"
                     />
-
                   </div>
 
                   <div>
-
                     <label className="mb-2 block text-xs text-white/40">
                       Company
                     </label>
@@ -535,14 +428,10 @@ export default function Home() {
                       placeholder="Company name"
                       className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3.5 text-sm outline-none transition placeholder:text-white/20 focus:border-white/30"
                     />
-
                   </div>
-
                 </div>
 
-                {/* SERVICE */}
                 <div>
-
                   <label className="mb-2 block text-xs text-white/40">
                     What do you need? *
                   </label>
@@ -553,38 +442,18 @@ export default function Home() {
                     defaultValue=""
                     className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3.5 text-sm text-white/70 outline-none focus:border-white/30"
                   >
-
                     <option value="" disabled>
                       Select a service
                     </option>
-
-                    <option>
-                      Data Analytics
-                    </option>
-
-                    <option>
-                      AI Solutions
-                    </option>
-
-                    <option>
-                      Business Automation
-                    </option>
-
-                    <option>
-                      Data Engineering
-                    </option>
-
-                    <option>
-                      Custom Solution
-                    </option>
-
+                    <option>Data Analytics</option>
+                    <option>AI Solutions</option>
+                    <option>Business Automation</option>
+                    <option>Data Engineering</option>
+                    <option>Custom Solution</option>
                   </select>
-
                 </div>
 
-                {/* BUDGET */}
                 <div>
-
                   <label className="mb-2 block text-xs text-white/40">
                     Estimated budget
                   </label>
@@ -594,38 +463,18 @@ export default function Home() {
                     defaultValue=""
                     className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3.5 text-sm text-white/70 outline-none focus:border-white/30"
                   >
-
                     <option value="" disabled>
                       Select a range
                     </option>
-
-                    <option>
-                      Under ₹25,000
-                    </option>
-
-                    <option>
-                      ₹25,000 – ₹50,000
-                    </option>
-
-                    <option>
-                      ₹50,000 – ₹1,00,000
-                    </option>
-
-                    <option>
-                      ₹1,00,000+
-                    </option>
-
-                    <option>
-                      Not sure yet
-                    </option>
-
+                    <option>Under ₹25,000</option>
+                    <option>₹25,000 – ₹50,000</option>
+                    <option>₹50,000 – ₹1,00,000</option>
+                    <option>₹1,00,000+</option>
+                    <option>Not sure yet</option>
                   </select>
-
                 </div>
 
-                {/* PROJECT */}
                 <div>
-
                   <label className="mb-2 block text-xs text-white/40">
                     Tell us about your project *
                   </label>
@@ -637,19 +486,14 @@ export default function Home() {
                     placeholder="What are you trying to achieve? What problem are you facing?"
                     className="w-full resize-none rounded-xl border border-white/10 bg-black/30 px-4 py-3.5 text-sm outline-none transition placeholder:text-white/20 focus:border-white/30"
                   />
-
                 </div>
 
-                {/* SUBMIT */}
                 <button
                   type="submit"
                   disabled={loading}
                   className="group flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-4 text-sm font-semibold text-black transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-
-                  {loading
-                    ? "Sending..."
-                    : "Send enquiry"}
+                  {loading ? "Sending..." : "Send enquiry"}
 
                   {!loading && (
                     <ArrowRight
@@ -657,47 +501,32 @@ export default function Home() {
                       className="transition-transform group-hover:translate-x-1"
                     />
                   )}
-
                 </button>
 
                 <p className="text-center text-[11px] leading-5 text-white/20">
-                  By submitting this form, you agree that DataForge AI
-                  can contact you regarding your enquiry.
+                  By submitting this form, you agree that DataForge AI can
+                  contact you regarding your enquiry.
                 </p>
-
               </form>
-
             )}
-
           </div>
-
         </div>
-
       </section>
 
       {/* FOOTER */}
       <footer className="border-t border-white/10">
-
         <div className="mx-auto flex max-w-7xl flex-col gap-5 px-6 py-8 sm:flex-row sm:items-center sm:justify-between">
-
           <div>
-            <p className="text-sm font-semibold">
-              DataForge AI
-            </p>
+            <p className="text-sm font-semibold">DataForge AI</p>
 
             <p className="mt-1 text-xs text-white/25">
               Data · AI · Automation
             </p>
           </div>
 
-          <p className="text-sm text-white/30">
-            © 2026 DataForge AI
-          </p>
-
+          <p className="text-sm text-white/30">© 2026 DataForge AI</p>
         </div>
-
       </footer>
-
     </main>
   );
 }
