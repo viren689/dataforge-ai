@@ -21,18 +21,17 @@ export const metadata: Metadata = {
   },
 
   description:
-    "DataForge AI is an AI-powered data analysis platform that helps you explore, analyze, and understand your data with intelligent insights.",
+    "DataForge AI helps businesses turn data, artificial intelligence and automation into practical technology that creates measurable value.",
 
   keywords: [
     "DataForge AI",
     "AI data analysis",
-    "data analysis",
-    "AI analytics",
     "data analytics",
+    "AI solutions",
+    "business automation",
+    "data engineering",
     "machine learning",
     "data visualization",
-    "CSV data analysis",
-    "AI-powered analytics",
   ],
 
   alternates: {
@@ -54,7 +53,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "DataForge AI | AI-Powered Data Analysis",
     description:
-      "Analyze your data with AI-powered insights, analytics, and visualization using DataForge AI.",
+      "DataForge AI provides practical technology solutions across data analytics, AI solutions, business automation and data engineering.",
     url: "https://dataforge-ai-nine.vercel.app/",
     siteName: "DataForge AI",
     type: "website",
@@ -65,7 +64,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "DataForge AI | AI-Powered Data Analysis",
     description:
-      "Analyze your data with AI-powered insights, analytics, and visualization.",
+      "Practical technology solutions across data analytics, AI solutions, business automation and data engineering.",
   },
 
   verification: {
@@ -78,12 +77,66 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://dataforge-ai-nine.vercel.app/#organization",
+        name: "DataForge AI",
+        url: "https://dataforge-ai-nine.vercel.app/",
+        email: "hello@dataforgeai.com",
+        description:
+          "DataForge AI helps businesses turn data, artificial intelligence and automation into practical technology that creates measurable value.",
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://dataforge-ai-nine.vercel.app/#website",
+        url: "https://dataforge-ai-nine.vercel.app/",
+        name: "DataForge AI",
+        description:
+          "Practical technology solutions across data analytics, AI solutions, business automation and data engineering.",
+        publisher: {
+          "@id": "https://dataforge-ai-nine.vercel.app/#organization",
+        },
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://dataforge-ai-nine.vercel.app/#webpage",
+        url: "https://dataforge-ai-nine.vercel.app/",
+        name: "DataForge AI | AI-Powered Data Analysis",
+        description:
+          "DataForge AI helps businesses turn data, artificial intelligence and automation into practical technology that creates measurable value.",
+        isPartOf: {
+          "@id": "https://dataforge-ai-nine.vercel.app/#website",
+        },
+        about: {
+          "@id": "https://dataforge-ai-nine.vercel.app/#organization",
+        },
+      },
+    ],
+  };
+
   return (
     <html
       lang="en"
-      className={geistSans.variable + " " + geistMono.variable + " h-full antialiased"}
+      className={
+        geistSans.variable +
+        " " +
+        geistMono.variable +
+        " h-full antialiased"
+      }
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData),
+          }}
+        />
+
+        {children}
+      </body>
     </html>
   );
 }
